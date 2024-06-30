@@ -1,0 +1,174 @@
+{% extends "profilepage/base.html" %}
+
+{% comment %} Vote block {% endcomment %}
+{% block rateProfile %}
+    <div class="rated">
+        <h4 id="point-rate"><b>{{target_user.avgStar}}</b></h4>
+        <h4 id="point-max"><b>/ 5</b></h4>
+        <i class="fa-solid fa-star"></i>
+        <h4 id="num-vote">({{target_user.num_votes}} lượt đánh giá)</h4>
+        {% comment %} if profile view not my profile then can vote {% endcomment %}
+        {% if target_user.account.id != user.account.id %}
+
+        {% endif %}
+    </div>
+    {% if target_user.account.id != user.account.id %}
+    <div class="votecontainer">
+        <button id="buttonvote" onclick="viewVote()">
+            <div>
+                <i class="fa-solid fa-marker"></i>
+                <span>Đánh giá</span>
+            </div>
+        </button>
+        <div id="voteProfile">
+            <form action="{% url 'profilepage:voteProfile' target_user.account_id%}" method="post">
+                {% csrf_token %}
+                <div class="starsvote">
+                    <input type="radio" id="one" name="rate" value="1">
+                    <label for="one" class="fa-solid fa-star"></label>
+                    <input type="radio" id="two" name="rate" value="2">
+                    <label for="two" class="fa-solid fa-star"></label>
+                    <input type="radio" id="three" name="rate" value="3">
+                    <label for="three" class="fa-solid fa-star"></label>
+                    <input type="radio" id="four" name="rate" value="4">
+                    <label for="four" class="fa-solid fa-star"></label>
+                    <input type="radio" id="five" name="rate" value="5">
+                    <label for="five" class="fa-solid fa-star"></label>
+                </div>
+                <div class="submit-closed">
+                    <a class="closed-vote" onclick="viewVote()">
+                        <i class="fa-regular fa-circle-xmark"></i>
+                    </a>
+                    <input type="submit" value="Gửi">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--// Hiển thị số sao đã đánh giá nếu người dùng đánh giá lại-->
+    <script>
+        const userRating = {{starsvotetarget}};
+        // Hàm lựa chọn mặc định đánh giá của người dùng
+        window.addEventListener('DOMContentLoaded', () => {
+            const radioButtons = document.querySelectorAll('input[name="rate"]');
+            radioButtons.forEach((radio) => {
+                if (parseInt(radio.value) === userRating) {
+                    radio.checked = true;
+                }
+            });
+        });
+    </script>
+    {% endif %}
+{% endblock rateProfile %}
+
+{% comment %} Info profile manager {% endcomment %}
+    {% block infoProfileManager %}
+    <div class="info-profile">
+        <div class="contacts-vote">
+            <div class="contacts-list">
+                {% if target_user.facebook_link %}
+                <a target="_blank" href="{{target_user.facebook_link}}" class="contact">
+                    <div class="icon-contact"><i class="fa-brands fa-facebook"></i></div>
+                </a>
+                {% endif %}
+                {% if target_user.website_link %}
+                <a href="{{target_user.website_link}}" class="contact">
+                    <div class="icon-contact"><i class="fa-solid fa-globe"></i></div>
+                </a>
+                {% endif %}
+                {% if target_user.phone %}
+                <a href="tel:{{target_user.phone}}" class="contact">
+                    <div class="icon-contact"><i class="fa-solid fa-phone"></i></div>
+                </a>
+                {% endif %}
+            </div>
+
+        </div>
+        <div class="address-info">
+            <a href="#map">
+                <i class="fa-solid fa-location-dot"></i>
+                {% if target_user.ward %}
+                <h4>{{target_user.ward}} </h4>
+                {% endif %}
+                {% if target_user.district %}
+                <h4>, {{target_user.district}} </h4>
+                {% endif %}
+                {% if target_user.city %}
+                <h4>, {{target_user.city}}</h4>
+                {% endif %}
+                <h4 style="display: flex;justify-content: flex-end;">({{ target_user.address }})</h4>
+            </a>
+        </div>
+    </div>
+    {% endblock infoProfileManager %}
+
+<!--  buttom-profile -->
+    {% block buttom_profile %}
+    <div class="buttom-profile">
+        <div class="bio">
+            <div class="bio-title">
+                <h3>Mô tả</h3>
+            </div>
+            <div class="bio-content">
+                <p>{{ target_user.bio }}</p>
+            </div>
+        </div>
+        <div class="menu">
+            <div class="menu-title">
+                <h3>Menu</h3>
+            </div>
+            <div class="list-menu">
+                <div class="products-list">
+                    <!-- Product list-->
+                    {% if target_user.account.role == 'manager' %}
+                        {% for product in target_user.product_set.all %}
+                        {% comment %} Product {% endcomment %}
+                            <div class="product">
+                                <div class="product-img">
+                                    <img src="{{ product.img.url }}" alt="">
+                                </div>
+                                <div class="product-name">
+                                    <h4>{{ product.name }}</h4>
+                                </div>
+                                <div class="product-price-buy">
+                                    <div class="price">
+                                        <span>{{product.price}}</span>
+                                        <span>Đ</span>
+                                    </div>
+
+                                    {% if user.account.role == 'sharer' %}
+                                        <button onclick=addToCart({{product.id}}) class="buy" type="submit">
+                                            <i class="fa-solid fa-circle-plus"></i>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                            <h4>Không có sản phẩm nào</h4>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function actionBuy(){
+            alert("Sản phẩm đã được thêm vào giỏ hàng");
+        }
+            function addToCart(itemId){
+                $.ajax({
+                    url: `/shoppingcart/addToCart/`,
+                    type: `POST`,
+                    data: {
+                        'itemId': itemId,
+                    },
+                    success: function(response) {
+                        alert("Đã thêm vào giỏ hàng");
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            }
+    </script>
+    {% endblock buttom_profile %}

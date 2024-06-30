@@ -1,0 +1,49 @@
+{% extends "settingspage/base.html" %}
+{% load static %}
+{% block product %}
+
+    <div class="product-manager">
+        <div class="list-product">
+           
+                {% for product in user.product_set.all %}
+                    <div class="product">
+                        <div class="right-product">
+                            <div class="product-img">
+                                <img src="{{product.img.url}}" alt="">
+                            </div>
+                            <div class="product-info">
+                                <div class="product-name">
+                                    <h3>{{product.name}}</h3>
+                                </div>
+                                <div class="product-type">
+                                    <span>{{product.type}}</span>
+                                </div>
+                                <div class="product-price">
+                                    <span><b>{{product.price}} Đ</b></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="action-product">
+                            <a href="{% url 'settingspage:editProduct' product.id %}" class="edit-product">
+                                <div>
+                                    <i class="fa-solid fa-pen"></i>
+                                </div>
+                            </a>
+                            <a href="{% url 'settingspage:deleteProduct' product.id %}" class="delete-product">
+                                <div>
+                                    <i class="fa-solid fa-trash"></i>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+  
+        </div>
+        <a href="{% url 'settingspage:addProduct'%}" class="add-product">
+            <div class="container-add-product">
+                <i class="fa-solid fa-circle-plus"></i>
+                <h3>Thêm sản phẩm</h3>
+            </div>
+        </a>
+    </div>
+{% endblock product %}

@@ -1,0 +1,25 @@
+{% extends "common/layout.html" %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/restaurants.css'%}">
+{% endblock css %}
+{% block content %}
+    <div class="restaurants">
+        <div class="restaurant-list">
+            {% for shop in managers %}
+            <div class="restaurant">
+                <a href="{% url 'profilepage:profilePage' shop.account.id%}"><img src="{{shop.avatar.url}}" alt="" class="avatar" ></a>
+                <div class="restaurant-info">
+                    <h4><strong>{{shop.name}}</strong></h4>
+                    <h6><i class="fa-solid fa-star"> </i>   {{shop.avgStar}}</h6>
+                    <h6><i class="fa-solid fa-location-dot"></i> {{shop.ward}} - {{shop.district}} - {{shop.city}} </h6>
+                    <h6><i class="fa-solid fa-clock"></i> {{shop.t_open}} - {{shop.t_closed}}</h6>
+                </div>
+                <hr>
+                <p class="bio-content"  style="white-space: pre-line;">{{shop.bio}}</p>
+            </div>
+            {% endfor %}
+            
+        </div>
+    </div>
+{% endblock %}

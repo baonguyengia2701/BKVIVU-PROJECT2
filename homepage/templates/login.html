@@ -1,0 +1,91 @@
+{% extends "base/main.html" %}
+{% load static%}
+{% block info_user%}
+<div id="-box-login">
+    <a href="" id="tab_login"><i class="fa fa-fw fa-user"></i> Đăng nhập</a>
+    <div class="login">
+        <form method='POST'>
+            {% csrf_token %}
+            <h1>Login</h1>
+            <input id = "inputUsername" name = 'username' placeholder="Username" type="text" oninput="checkLogin()">
+            <input id = "inputPsw" name = 'password' placeholder="Password" type="password" oninput="checkLogin()">
+            <button name='login' type="submit" id="btnLogin" disabled="True">Submit</button>
+            <script>
+                function checkLogin() {
+                    // Kiểm tra điều kiện và thiết lập thuộc tính disabled
+                    var inputUsername = document.getElementById('inputUsername');
+                    var inputPsw = document.getElementById('inputPsw');
+                    // Thay bằng điều kiện thực tế từ server hoặc nơi khác
+                    if (inputPsw.value.length >= 8 && inputUsername.value.length > 0) {
+                        console.log('Ấn được nhé');
+                    document.getElementById('btnLogin').disabled = false;
+                    }
+                    else{
+                        console.log('Button disabled true.');
+                        document.getElementById('btnLogin').disabled = true;
+                    }
+                }
+              </script>
+        </form>
+    </div>
+</div>
+<div id="-box-signup" >
+    <button class="sign-up-btn" onclick="document.getElementById('id01').style.display='block'" style="width:auto;">Đăng kí</button>
+    <div id="id01" class="modal">
+        <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+        <form class="modal-content" method='POST' >
+            {% csrf_token %}
+            <div class="container">
+                <h1>Sign Up</h1>
+                <p>Please fill in this form to create an account.</p>
+                <hr>
+                <label for="username"><b>Username</b></label>
+                <input type="text" placeholder="Enter Username" name="rgt_username" required>
+
+                <label for="username"><b>Email</b></label>
+                <input type="text" placeholder="Enter Email" name="rgt_email" required>
+                
+                <label for="psw"><b>Password</b></label>
+                <input type="password" placeholder="Enter Password" name="rgt_psw" id="inputPswRegister" oninput="checkPassword()" required>
+        
+                <label for="psw-repeat"><b>Repeat Password</b></label>
+                <input type="password" placeholder="Repeat Password" name="rgt_repsw" id="inputRepsw" oninput="checkPassword()" required>
+                
+                {% comment %} {{form_rgt}} {% endcomment %}
+                <label for="role"><strong>Đăng kí với vai trò:</strong></label>
+                <select id="role" name="role">
+                    <option value="manager">Người quản lý</option>
+                    <option value="sharer">Người chia sẻ</option>
+                    <!-- Thêm các option khác nếu cần -->
+                </select>
+                <!-- <label>
+                <input type="checkbox" checked="checked" name="remember" style="margin-bottom:15px"> Remember me
+                </label> -->
+        
+                <!-- <p>By creating an account you agree to our <a href="#" style="color:dodgerblue">Terms & Privacy</a>.</p> -->
+                <hr>
+               
+                <div class="clearfix">
+                <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+                <button name='register' type="submit" class="signupbtn" disabled="true" id="btnRegister">Sign Up</button>
+                </div>
+            </div>
+            <script src="{% static 'js/header_login.js' %}"></script>
+        </form>
+    </div>
+</div>  
+{% endblock%} 
+
+{% block slideShowTopShop %}
+<div class="mySlides fade">
+    <img src="{% static 'images/img11.jpg' %}" style="width:100%; height: 600px">
+</div>
+
+<div class="mySlides fade">
+    <img src="{% static 'images/img22.jpg' %}" style="width:100%; height: 600px;">
+</div>
+
+<div class="mySlides fade">
+    <img src="{% static 'images/img33.jpg' %}" style="width:100%; height: 600px">
+</div>
+{% endblock slideShowTopShop %}

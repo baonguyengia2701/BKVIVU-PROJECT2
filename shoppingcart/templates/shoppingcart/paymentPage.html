@@ -1,0 +1,174 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán</title>
+    <script src="https://kit.fontawesome.com/bc4d8a1311.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'headerStyle.css' %}">
+    <link rel="stylesheet" href="{% static 'paymentStyle.css' %}">
+</head>
+<body>
+<!-- Header -->
+<div class="header" style="padding: 0px 35px;">
+    <div class="left">
+        <a href="{% url 'homepage:homePage' %}" class="logo">
+            <img src="{% static 'images/logo.png' %}"  alt="logo">
+            <div class = "description">
+                <h2><strong>BKvivu</strong></h2>
+                <p style="width: 400px;">Nền tảng chia sẻ dịch vụ hàng đầu</p>
+            </div> 
+        </a>
+    </div>
+        
+    <div class="right">
+        <div id="-box-nav">
+            <a href="{% url 'postspage:posts' %}" id="community"><i class="fa fa-fw fa-users"></i>Khám phá</a>
+            <div class="subnav">
+                <a href="{% url 'postspage:restaurants' %}">Cửa hàng</a>
+                <a href="{% url 'postspage:posts' %}">Bài chia sẻ</a>
+            </div>
+        </div>
+        {% if acc.role == 'sharer' %}
+            <div class="setting_icon">
+                <a href="{% url 'shoppingcart:shoppingCart'  %}" class="setting">
+                    <div >
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Cart</span>
+                    </div>
+                </a>
+            </div>
+            {% endif %}
+        <div class="setting_icon">
+            <a href="{% url 'settingspage:settingsPage' %}" class="setting">
+                <div >
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+                </div>
+            </a>
+        </div>
+        <div class="setting_icon">
+            <a href="/logout/" class="setting">
+                <div>
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Logout</span>
+                </div>
+            </a>
+        </div>
+        <a href="{% url 'profilepage:profilePage' acc.id%}" class="logo-user" style="width: auto;">
+            <img class="img-user" src = "{{user.avatar.url}}"/>
+        </a>
+        
+    </div>
+</div>
+<!-- Container Body -->
+<div class="container-body flex ">
+    <div class="container-left flex ">
+        <h2 class="text-qr">QR Thanh Toán</h2>
+        <img class="payment-qrcode" src="{{manager.bank.url}}" alt="">
+        <form action="" method="post" enctype="multipart/form-data" class="payment-form flex">
+            {% csrf_token %}
+            <div class="payment-input flex">
+                <label for="id_img"><b>Ảnh thanh toán:</b></label>
+                {{form_pay.img}}
+            </div>
+            <button class="btn btn-primary">Xác Nhận</button>
+        </form>
+    </div>
+    <div class="container-right flex ">
+        <h3 id="countdown"></h3>
+        <h2 class="text-qr">Đơn hàng của bạn tại <a href="{% url 'profilepage:profilePage' manager.account.id%}"><b>{{manager.name}}</b></a> bao gồm:</h2>
+        <div class="list-order flex">
+            {% for order in bill.order_set.all %}
+                <div class="order flex ">
+                    <div class="product flex ">
+                        <img src="{{order.product.img.url}}" alt="{{order.product.name}}">
+                        <div class="info-product ">
+                            <h3>{{order.product.name}}</h3>
+                            <h5>Giá: {{order.product.price}}</h5>
+                        </div>
+                    </div>
+                    <div class="quantity-product ">
+                        <span><b>Số lượng: {{order.quantity}}</b></span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="total-price">
+            <h3>Tổng thanh toán: <b>{{bill.price}} VNĐ</b></h3>
+        </div>
+        <div class="notes">
+            <h4>Quý khách vui lòng thanh toán đúng số tiền và gửi ảnh giao dịch chuyển khoản!</h4>
+        </div>
+    </div>
+</div>
+
+<div class="order-list">
+    <a href="{% url 'shoppingcart:orderList'%}">Đơn Hàng Đã Đặt</a>
+</div>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="waves">
+          <div class="wave" id="wave1"></div>
+          <div class="wave" id="wave2"></div>
+          <div class="wave" id="wave3"></div>
+          <div class="wave" id="wave4"></div>
+        </div>
+        <ul class="social-icon">
+          <li class="social-icon__item"><a class="social-icon__link" href="#">
+              <ion-icon name="logo-facebook"></ion-icon>
+            </a></li>
+          <li class="social-icon__item"><a class="social-icon__link" href="#">
+              <ion-icon name="logo-twitter"></ion-icon>
+            </a></li>
+          <li class="social-icon__item"><a class="social-icon__link" href="#">
+              <ion-icon name="logo-linkedin"></ion-icon>
+            </a></li>
+          <li class="social-icon__item"><a class="social-icon__link" href="#">
+              <ion-icon name="logo-instagram"></ion-icon>
+            </a></li>
+        </ul>
+        <ul class="menu">
+          <li class="menu__item"><a class="menu__link" href="#">Home</a></li>
+          <li class="menu__item"><a class="menu__link" href="#">About</a></li>
+          <li class="menu__item"><a class="menu__link" href="#">Services</a></li>
+          <li class="menu__item"><a class="menu__link" href="#">Team</a></li>
+          <li class="menu__item"><a class="menu__link" href="#">Contact</a></li>
+
+        </ul>
+        <p>&copy;2023 BKvivu | BaoDungDatDatThanhTruong</p>
+    </footer>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+{% comment %} -----Thời gian thanh toán -------- {% endcomment %}
+    <script>
+        let timeRemaining = {{ time_remaining }};
+        // Hàm cập nhật thời gian
+        function updateCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+
+            const displayMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+            const displaySeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
+
+            // Hiển thị thời gian còn lại
+            countdownElement.textContent = `Thời gian thanh toán còn lại: ${displayMinutes}:${displaySeconds}`;
+            timeRemaining--;// Giảm thời gian
+            if (timeRemaining >= 0) {
+                setTimeout(updateCountdown, 1000);
+            } else {
+                alert("Đơn hàng tự động hủy vì quá hạn thanh toán!");
+                const bill_id = {{bill.id}};
+                const timeoutPaymentUrl = `/shoppingcart/timeoutpayment/${bill_id}/`;
+                const absolutePaymentUrl = window.location.origin + timeoutPaymentUrl;
+                window.location.href = absolutePaymentUrl;
+            }
+        }
+        document.addEventListener('DOMContentLoaded', updateCountdown);
+    </script>
+</body>
+</html>

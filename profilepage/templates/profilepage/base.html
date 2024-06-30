@@ -1,0 +1,290 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="{% static 'header.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="{% static 'votestyle.css' %}">
+    <link rel="stylesheet" href="{% static 'postStyle.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://kit.fontawesome.com/bc4d8a1311.js" crossorigin="anonymous"></script>
+    <script src="{% static 'votescript.js' %}"></script>
+    <script src="{% static 'postScript.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+</head>
+<body>
+    <div class="header" style="padding: 0px 35px;">
+        <div class="left">
+            <a href="{% url 'homepage:homePage' %}" class="logo">
+                <img src="{% static 'images/logo.png' %}"  alt="logo">
+                <div class = "description">
+                    <h2><strong>BKvivu</strong></h2>
+                    <p style="width: 400px;">Nền tảng chia sẻ dịch vụ hàng đầu</p>
+                </div> 
+            </a>
+        </div>
+            
+        <div class="right">
+            <div id="-box-nav">
+                <a href="{% url 'postspage:posts' %}" id="community"><i class="fa fa-fw fa-users"></i>Khám phá</a>
+                <div class="subnav">
+                    <a href="{% url 'postspage:restaurants' %}">Cửa hàng</a>
+                    <a href="{% url 'postspage:posts' %}">Bài chia sẻ</a>
+                </div>
+            </div>
+            {% if acc.role == 'sharer' %}
+            <div class="setting_icon">
+                <a href="{% url 'shoppingcart:shoppingCart'  %}" class="setting">
+                    <div >
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Cart</span>
+                    </div>
+                </a>
+            </div>
+            {% endif %}
+            <div class="setting_icon">
+                <a href="{% url 'settingspage:settingsPage' %}" class="setting">
+                    <div >
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                    </div>
+                </a>
+            </div>
+            <div class="setting_icon">
+                <a href="/logout/" class="setting">
+                    <div>
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Logout</span>
+                    </div>
+                </a>
+            </div>
+            <a href="{% url 'profilepage:profilePage' acc.id%}" class="logo-user" style="width: auto;">
+                <img class="img-user" src = "{{user.avatar.url}}"/>
+            </a>
+            
+        </div>
+    </div>
+    <!-- Chat logo -->
+    <div class="chatbox">
+        <a href="{% url 'profilepage:chatDefault' target_user.account_id %}" class="chat-link">
+            <div class="chat-label">
+                <i class="fa-solid fa-message"></i>
+                <span>Chat</span>
+            </div>
+        </a>
+    </div>
+
+
+    <!--Top navbar -->
+    <!--<div class="topnav">
+        <a href="{% url 'homepage:homePage' %}" class="logo-home">
+            <div class="logo">
+
+            </div>
+            <div class="app-name">
+                <h4>BKvivu</h4>
+                <span class="">Nền tảng chia sẻ dịch vụ hàng đầu</span>
+            </div>
+        </a>
+        <div class="option">
+            <a href="{% url 'profilepage:profilePage' user.account.id%}" class="my-profile">
+                <div>
+                <i class="fa-solid fa-user"></i>
+                <span>My Profile</span>
+                </div>
+            </a>
+
+            <a href="{% url 'settingspage:settingsPage' %}" class="setting">
+                <div >
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+                </div>
+            </a>
+
+            {% if user.account.role == "sharer" %}
+            <a href="{% url 'shoppingcart:shoppingCart'%}" class="log-out">
+                <div>
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Giỏ hàng</span>
+                </div>
+            </a>
+            {% endif %}
+            <a href="{% url 'profilepage:logoutPage'%}" class="log-out">
+                <div>
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Log out</span>
+                </div>
+            </a>
+
+        </div>
+    </div>
+-->
+    <!-- Info profile -->
+    <div class="top-profile" {% if target_user.account.role == 'sharer' %}style="background-color: white;"{% endif %}>
+        <div class="avatar-name">
+            <div class="avatar">
+                <img src = "{{ target_user.avatar.url}}" alt="">
+                {% if target_user.account.role == 'manager' %}<i class="fa-solid fa-shop"></i>{% endif %}
+            </div>
+            <div class="name">
+                <h1 id="name-profile">{{ target_user.name }}</h2>
+                {% if target_user.account.role == 'manager' %}
+                    {% block rateProfile %}
+                    {% endblock rateProfile %}
+                {% endif %}
+            </div>
+            {% if target_user.account.role == 'manager' and user.account.role == 'sharer' %}
+            <div>
+                <a href="{% url 'profilepage:chatPage' target_user.account.id target_user.account.id %}">
+                    <i style="font-size: 40px;" class="fas fa-comment-dots"></i>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    {% if target_user.account.role == "manager" %}
+        {% block infoProfileManager %}
+        {% endblock infoProfileManager %}
+    {% endif %}
+    </div>
+    <!--  buttom-profile of manager account-->
+    {% if target_user.account.role == "manager" %}
+        {% block buttom_profile %}
+        {% endblock buttom_profile %}
+    {% endif %}
+    <!-- Contents -->
+    <div class="contents">
+        <div class="top-contents">
+            <div class="top-contents-left">
+                <i class="fa-solid fa-newspaper"></i>
+                <h1>Bài viết</h1>
+            </div>
+            <div class="top-contents-right">
+
+            </div>
+        </div>
+        <div class="list-contents">
+
+            {% if target_user.account and listPosts%}
+            <ul>
+                {% for posts in listPosts %}
+                    <!-- Post # -->
+                    <li class="item">
+                        <div class="info-post">
+                            <a href="{% url 'profilepage:profilePage' target_user.account.id%}">
+                                <img src="{{target_user.avatar.url}}" alt="{{target_user.name}}" class="avatar-post">
+                            </a>
+                            <h3><strong>{{target_user.name}}</strong></h3>
+                            <h6>Time: <strong>{{posts.time}}</strong></h6>
+                            <p>
+                            {% if posts.provider %}
+                                Đang ở: <a href="{% url 'profilepage:profilePage' posts.provider.account.id%}"><strong>{{posts.provider.name}}</strong></a>
+                            {% else %}
+                                {% if posts.ward and posts.district and posts.city%}
+                                    <i class="fa-solid fa-location-dot"></i>
+                                        {{posts.ward}} - {{posts.district}} - {{posts.city}} ({{posts.address}})
+                                {% endif %}
+                            {% endif %}
+                            </p>
+                        </div>
+                        <h3 style="margin: 5px 0;"><strong>{{posts.title}}</strong></h3>
+                        <p style="white-space: pre-line;">{{posts.content}}</p>
+
+                        {% if posts.image_set.all %}
+                        <div class="post-photo">
+                            {% for image in posts.image_set.all %}
+                            <img src="{{image.img.url}}" alt="{{posts.title}} 1" class="photo">
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="post-actions">
+                            <!-- LIKE -->
+                            {% if posts in listPostsLike %}
+                            <button value="true" onclick="likeAction(event, {{posts.id}})" style="background-color: #f00;">
+                            {% else %}
+                            <button value="false" onclick="likeAction(event, {{posts.id}})">
+                            {% endif %}
+                                <big id="{{posts.id}}_like">{{posts.like}} </big>
+                                <i class="far fa-thumbs-up"></i>
+                            </button>
+                            <!-- Comment -->
+                            <button onclick="showComment(event, {{ posts.id }})">
+                                <big id="{{posts.id}}_commentNum">{{posts.commentNum}} </big>
+                                <i class="far fa-comment"></i>
+                            </button>
+                        </div>
+
+                        <div class="post-comment">
+                            <img src="{{user.avatar.url}}" alt="" class="avatar">
+                            <input type="text" placeholder="Viết bình luận ..." class="comment-input" id="{{posts.id}}_comment">
+                            <button class="sendCmt" onclick="insertComment(event, {{posts.id}})"> Gửi</button>
+                        </div>
+                        {% comment %} ----------Comments----------- {% endcomment %}
+                    </li>
+                    {% comment %} End post {% endcomment %}
+                {% endfor %}
+            </ul>
+            <div class="list-comment-container" id="containerComment">
+                <div class="list-comment">
+                    <div class="close-comment">
+                        <button id="cancelButton" onclick="cancelComment()"><i class="fa-solid fa-rectangle-xmark"></i></button>
+                    </div>
+                  <section class="gradient-custom">
+                    <div class="container-comment" style="display: block;">
+                        <h4>Comments</h4>
+                        <div class="col" id="allCommentOfPostId">
+                            {% comment %} List Comments {% endcomment %}
+                        </div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+            {% else %}
+                <h3 style="padding: 20px 20px 20px 20px;">Người này hiện chưa có bài viết nào!</h3>
+            {% endif %}
+            <!-- End listpost -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="waves">
+          <div class="wave" id="wave1"></div>
+          <div class="wave" id="wave2"></div>
+          <div class="wave" id="wave3"></div>
+          <div class="wave" id="wave4"></div>
+        </div>
+        <ul class="social-icon">
+          <li class="social-icon__item"><a class="social-icon__link" href="#">
+              <ion-icon name="logo-facebook"></ion-icon>
+            </a></li>
+          <li class="social-icon__item"><a class="social-icon__link" href="#">
+              <ion-icon name="logo-twitter"></ion-icon>
+            </a></li>
+          <li class="social-icon__item"><a class="social-icon__link" href="#">
+              <ion-icon name="logo-linkedin"></ion-icon>
+            </a></li>
+          <li class="social-icon__item"><a class="social-icon__link" href="#">
+              <ion-icon name="logo-instagram"></ion-icon>
+            </a></li>
+        </ul>
+        <ul class="menu">
+          <li class="menu__item"><a class="menu__link" href="#">Home</a></li>
+          <li class="menu__item"><a class="menu__link" href="#">About</a></li>
+          <li class="menu__item"><a class="menu__link" href="#">Services</a></li>
+          <li class="menu__item"><a class="menu__link" href="#">Team</a></li>
+          <li class="menu__item"><a class="menu__link" href="#">Contact</a></li>
+
+        </ul>
+        <p>&copy;2023 BKvivu | BaoDungDatDatThanhTruong</p>
+    </footer>
+
+
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

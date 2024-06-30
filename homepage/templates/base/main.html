@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- css -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+        <link rel="stylesheet" href="{% static 'css/styles.css'%}"></link>
+        <link rel="stylesheet" href="{% static 'css/header.css'%}"></link>
+        <link rel="stylesheet" href="{% static 'css/slideshow.css'%}"></link>
+        <link rel="stylesheet" href="{% static 'css/topshop.css'%}"></link>
+        <link rel="stylesheet" href="{% static 'css/toppost.css'%}"></link>
+        <link rel="stylesheet" href="{% static 'css/searching.css'%}"></link>
+        <link rel="stylesheet" href="{% static 'css/footer.css'%}"></link>
+
+        <!-- js -->
+        
+        <script src="https://kit.fontawesome.com/f7ff863b9b.js" crossorigin="anonymous"></script>
+        <link rel = "icon" href ="{% static 'images/logo.png' %}" type = "image/x-icon"> 
+        <title>BKvivu - nền tảng chia sẻ trải nghiệm và quản lý dịch vụ</title>
+        
+    </head>
+    <body>
+        {% comment %} alert thông báo kết quả đăng kí/ đăng nhập -------------------------------{% endcomment %}
+        {% for message in messAlert %}
+            <script>
+                console.log("{{message}}");
+                alert("{{message}}");
+            </script>
+        {% endfor %}
+
+        {% comment %} Phần header -----------------------------------------------------------{% endcomment %}
+        <div class="header">
+            <div class="left">
+                <a href="" class="logo">
+                    <img src="{% static 'images/logo.png' %}"  alt="logo">
+                    <div class = "description">
+                        <h2>BKvivu</h2>
+                        <p>Nền tảng chia sẻ dịch vụ hàng đầu</p>
+                    </div> 
+                </a>
+            </div>
+            
+            {% block headerSearch %}{% endblock headerSearch %}
+                
+            <div class="right">
+                {% block info_user %} {% endblock %}
+            </div>
+        </div>
+
+        {% comment %} Phần slideshow ----------------------------------------------------------{% endcomment %}
+        <div class="slideshow-container" >
+            {% block slideShowTopShop %}{% endblock slideShowTopShop %}
+    
+            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+        </div>
+        <br>
+        <div style="text-align:center">
+            <span class="dot" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+            <span class="dot" onclick="currentSlide(3)"></span>
+        </div>
+    
+        {% block feature %}{% endblock feature %}
+
+        <footer class="footer">
+            <div class="waves">
+              <div class="wave" id="wave1"></div>
+              <div class="wave" id="wave2"></div>
+              <div class="wave" id="wave3"></div>
+              <div class="wave" id="wave4"></div>
+            </div>
+            <ul class="social-icon">
+              <li class="social-icon__item"><a class="social-icon__link" href="#">
+                  <ion-icon name="logo-facebook"></ion-icon>
+                </a></li>
+              <li class="social-icon__item"><a class="social-icon__link" href="#">
+                  <ion-icon name="logo-twitter"></ion-icon>
+                </a></li>
+              <li class="social-icon__item"><a class="social-icon__link" href="#">
+                  <ion-icon name="logo-linkedin"></ion-icon>
+                </a></li>
+              <li class="social-icon__item"><a class="social-icon__link" href="#">
+                  <ion-icon name="logo-instagram"></ion-icon>
+                </a></li>
+            </ul>
+            <ul class="menu">
+              <li class="menu__item"><a class="menu__link" href="#">Home</a></li>
+              <li class="menu__item"><a class="menu__link" href="#">About</a></li>
+              <li class="menu__item"><a class="menu__link" href="#">Services</a></li>
+              <li class="menu__item"><a class="menu__link" href="#">Team</a></li>
+              <li class="menu__item"><a class="menu__link" href="#">Contact</a></li>
+        
+            </ul>
+            <p>&copy;2023 BKvivu | BaoDungDatDatThanhTruong</p>
+        </footer>
+    
+        <script src="{% static 'js/scripts.js' %}"></script>
+        <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+        <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script>
+    var citis = document.getElementById("city");
+    var districts = document.getElementById("district");
+    var wards = document.getElementById("ward");
+    var Parameter = {
+        url: "https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json", 
+        method: "GET", 
+        responseType: "application/json", 
+    };
+    var promise = axios(Parameter);
+    promise.then(function (result) {
+    renderCity(result.data);
+    });
+
+    function renderCity(data) {
+    for (const x of data) {
+        citis.options[citis.options.length] = new Option(x.Name, x.Id);
+    }
+    citis.onchange = function () {
+        district.length = 1;
+        ward.length = 1;
+        if(this.value != ""){
+        const result = data.filter(n => n.Id === this.value);
+
+        for (const k of result[0].Districts) {
+            district.options[district.options.length] = new Option(k.Name, k.Id);
+        }
+        }
+    };
+    district.onchange = function () {
+        ward.length = 1;
+        const dataCity = data.filter((n) => n.Id === citis.value);
+        if (this.value != "") {
+        const dataWards = dataCity[0].Districts.filter(n => n.Id === this.value)[0].Wards;
+
+        for (const w of dataWards) {
+            wards.options[wards.options.length] = new Option(w.Name, w.Id);
+        }
+        }
+    };
+    }
+	</script>
+    </body>
+</html>

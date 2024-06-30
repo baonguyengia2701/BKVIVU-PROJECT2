@@ -1,0 +1,441 @@
+{% extends "base/main.html" %}
+{% load static %}
+
+{% comment %} block của avatar trên header {% endcomment %}
+{% block info_user%}
+<div id="-box-nav">
+    <a href="{% url 'postspage:posts' %}" id="community"><i class="fa fa-fw fa-users"></i>Khám phá</a>
+    <div class="subnav">
+        <a href="{% url 'postspage:restaurants' %}">Dịch vụ</a>
+        <a href="{% url 'postspage:posts' %}">Bài chia sẻ</a>
+    </div>
+</div>
+{% if acc.role == 'sharer' %}
+<div class="setting_icon">
+    <a href="{% url 'shoppingcart:shoppingCart'  %}" class="setting">
+        <div >
+            <i class="fa-solid fa-cart-shopping"></i>
+        <span>Cart</span>
+        </div>
+    </a>
+</div>
+{% endif %}
+<div class="setting_icon">
+    <a href="{% url 'settingspage:settingsPage' %}" class="setting">
+        <div >
+        <i class="fa-solid fa-gear"></i>
+        <span>Settings</span>
+        </div>
+    </a>
+</div>
+<a href="{% url 'profilepage:profilePage' acc.id%}" class="logo-user" style="width: auto;">
+    <img class="img-user" src = "{{user.avatar.url}}"/>
+</a>
+
+{% endblock %}
+
+{% block headerSearch %}
+<div class="center">
+    <form>
+        <input type="text" placeholder="Nay đi đâu ta ..." id="headerSearch">
+        <button name="btnHeaderSearch" type="button" onclick="clickHeaderSearch(event)"><i class="fa fa-search"></i></button>
+    </form>
+</div>
+<script>
+    // header search
+    function clickHeaderSearch(event){
+        var inputElement = document.getElementById("headerSearch");
+        var searchKey = inputElement.value;
+
+        var searchKeyElement = document.getElementById("searchKey")
+        searchKeyElement.value = searchKey;
+
+        var timKiemElement = document.getElementById("TimKiem");
+        timKiemElement.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+{% endblock headerSearch %}
+
+{% block slideShowTopShop %}
+    {% for shop in top_shops|slice:":3" %}
+    <div class="mySlides fade">
+        <img src="{{shop.avatar.url}}" style="width:100%; height: 600px">
+    </div>
+    {% endfor %}
+
+{% endblock slideShowTopShop %}
+
+{% block feature %}
+        {% comment %} Phần hiển thị top các cửa hàng/ dịch vụ ---------------------------------------{% endcomment %}
+        <div id="top-shop">
+            <h2 class="h2-header">TOP DỊCH VỤ</h2>
+            <div class="tab">
+                {% for shop in top_shops %}
+                <button class = "tablinks {% if forloop.counter == 1 %}active{% endif %}" onclick="openCity(event, 'top{{ forloop.counter }}')">
+                    <div class="number">
+                        <h2>{{ forloop.counter }}</h2>
+                    </div>
+                    <a href="{% url 'profilepage:profilePage' shop.account.id%}">
+                        <img src="{{shop.avatar.url}}" alt="logo_shop">
+                    </a>
+                    <div class="stars">
+                        <p>{{shop.avgStar}}/5 <span><img src="{% static 'images/star.png' %}" alt=""></span></p>
+                        <h2>{{shop.name}}</h2>
+                    </div>
+                </button>
+                {% endfor %}
+            </div>
+            {% for shop in top_shops %}
+            <div id="top{{ forloop.counter }}" class="tabcontent" {% if forloop.counter == 1 %} style="display: block;" {% endif %}>
+                <img src="{{ shop.avatar.url}}" alt="">
+            </div>
+            {% endfor %}
+
+        </div>
+        
+        {% comment %} Phần hiển thị top bài viết nổi bật-------------------------------------------- {% endcomment %}
+        <div id="comment">
+            <h2 class="h2-header">BÀI VIẾT TIÊU BIỂU</h2>
+            <div id="comment-body">
+                <div class="prev">
+                    <a href="#">
+                        <img src="{% static 'images/prev.png' %}" alt="" width="50px">
+                    </a>
+                </div>
+                <ul class="post-list">
+                    {% for item in topPosts %}
+                    <li class="item">
+                        <div class="info">
+                            <a href="{% url 'profilepage:profilePage' item.post.account.id%}">
+                                <img src="{{item.author.avatar.url}}" alt="{{item.post.account.username}}" class="avatar">
+                            </a>
+                            <h2>{{item.author.name}}</h2>
+                            <h3>Time: {{item.post.time}}</h3>
+                            <p> 
+                                {% if item.post.provider %}
+                                    Đang ở: <a href="{% url 'profilepage:profilePage' item.post.provider.account.id%}"><strong>{{item.post.provider.name}}</strong></a>
+                                {% else %}
+                                    {% if item.post.ward and item.post.district and item.post.city%}
+                                        <i class="fa-solid fa-location-dot"></i>
+                                            {{item.post.ward}} - {{item.post.district}} - {{item.post.city}}
+                                        <div style="display: flex;justify-content: center;">({{item.post.address}})
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </p>
+                        </div>
+                        <h2 class="title"><strong>{{item.post.title}}</strong></h2>
+                        <p class="content">{{item.post.content}}</p>
+
+                        {% if item.img|length > 0 %}
+                    <div class="post-photo">
+                        {% for image in item.img %}
+                        <img src="{{image.img.url}}" alt="Post 1" class="photo">
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                        <div class="post-actions">
+                            {% if item.userLike %}
+                            <button value="true" onclick="likeAction(event, {{item.post.id}})" style="background-color: #f00;"> 
+                            {% else %}
+                            <button value="false" onclick="likeAction(event, {{item.post.id}})"> 
+                            {% endif %}
+                                <span id="{{item.post.id}}_like">{{item.post.like}} </span>
+                                <i class="far fa-thumbs-up"></i> 
+                            </button>
+                            <button onclick="showComment(event, {{item.post.id}})">{{item.post.commentNum}} <i class="far fa-comment"></i></button>
+                        </div>
+                    </li>
+                    {% endfor %}
+                
+                </ul>
+                <div class="next">
+                    <a href="#">
+                        <img src="{% static 'images/next.png' %}" alt="" width="50px">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <script>
+                function likeAction(event, postId) {
+                    const button = event.currentTarget;
+                    const likeElement = document.getElementById(postId + "_like");
+                    const like = parseInt(likeElement.innerText, 10);   
+                    let newLike = like;
+                    if( button.value === "false"){
+                        newLike = like + 1;
+                        button.value = "true";
+                        button.style.backgroundColor = '#f00';
+                    }
+                    else{
+                        newLike = like - 1;
+                        button.value = "false";
+                        button.style.backgroundColor = '#fff';
+                    }
+                    likeElement.innerText = newLike
+        
+                    // Gửi yêu cầu AJAX để cập nhật số lượng like trên server
+                    const xhr = new XMLHttpRequest();
+                    xhr.open("POST", `/homepage/update_likes/${postId}/`, true);
+                    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                    xhr.send(JSON.stringify({ like: newLike}));
+                }
+                function showComment(event, postId){
+                    alert("(Đang phát triển) xem chi tiết trang cá nhân để Comment")
+                }
+        </script>
+        <br>
+        {% comment %} Phần tìm kiếm ----------------------------------------------------------------- {% endcomment %}
+        <div id="TimKiem"></div>
+        <h2 class="h2-header" id="searchhh">TÌM KIẾM</h2>
+        <div id="searching">
+            <div class="box-left" id="containerSearch">
+                <!-- Mặc định chưa tìm kiếm là hiển thị các sản phẩm mới nhất-->
+                {% for item in searchProduct %}
+                <div class="post">
+                    <img class="img-food" src="{{ item.img.url }}" alt="">
+                    <div class="info">
+                        <a href="{% url 'profilepage:profilePage' item.provider.account.id%}">
+                            <img class="img-avt" src="{{ item.provider.avatar.url }}" alt="">
+                        </a>
+                        <div class="text">
+                            <h3>{{item.name}}</h3>
+                            <p>Provider: {{ item.provider.name}}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="cost">
+                        <button onclick = "addToCart({{item.id}})">{{item.price}} VND</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="box-right">
+                <div class="searchcontent">
+                    <p>Tìm kiếm nhanh:</p>
+                    <button class="btnTag" name="food" onclick="searchTag(event, 'food')">Đồ ăn</button>
+                    <button class="btnTag" name="drink" onclick="searchTag(event, 'drink')">Đồ uống</button>
+                    <button class="btnTag" name="entertainment"  onclick="searchTag(event, 'entertainment')">Giải trí</button>
+                    <button class="btnTag" name="service" onclick="searchTag(event, 'service')">Dịch vụ khác</button>
+                    <hr>
+                </div>
+                <div class="search">
+                    <form action="#TimKiem">
+                    <label for="choices">Phân loại tìm kiếm:</label>
+                    <select id="choices" name="type">
+                        <option value="shop">Cửa hàng</option>
+                        <option value="product">Sản phẩm</option>
+                        <!-- Thêm các option khác nếu cần -->
+                    </select>
+                    <input id="searchKey" type="text" placeholder="Nay đi đâu ta ..." name="search">
+                    <!-- <button id = "filter" type="submit"><i class="fa fa-filter"></i></button> -->
+                    <button name="btnSearch" id = "search" type="button" onclick="mainSearch(event)"><i class="fa fa-search"></i></button>
+                    <br>
+                    <div class="searchby">
+                        <br>
+                        <div class="form-group">
+                            <label for="city">Khu vực:</label>
+                            <select class="form-select form-select-sm mb-3" id="city" name="city" aria-label=".form-select-sm">
+                            <option value="all" selected>Chọn tỉnh thành</option>           
+                            </select>
+                            <br>      
+                            <select class="form-select form-select-sm mb-3" id="district" name="district" aria-label=".form-select-sm">
+                            <option value="all" selected>Chọn quận huyện</option>
+                            </select>
+                            
+                            <select class="form-select form-select-sm" id="ward" name="ward" aria-label=".form-select-sm">
+                            <option value="all" selected>Chọn phường xã</option>
+                            </select>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <label for="t_open">Khoảng thời gian:</label>
+                            <input class="time"
+                                type="time"
+                                name="t_open"
+                                id="t_open"
+                                class="form-control"
+                                value="00:00"
+                            required
+                            ></input>
+                            {% comment %} <label for="t_closed">Thời gian đóng cửa:</label> {% endcomment %}
+                            <input class="time"
+                                type="time"
+                                name="t_closed"
+                                id="t_closed"
+                                class="form-control"
+                                value="23:59"
+                            required
+                            ></input>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        function searchTag(event, tag){
+            // reset màu các btnTag
+            var btnTags = document.querySelectorAll('.btnTag');
+            btnTags.forEach(function(btn) {
+                btn.style.backgroundColor = '#fff'; // Thay đổi màu nền thành xám
+            });
+            // Đổi màu tag hiện tại
+            const button = event.currentTarget;
+            button.style.backgroundColor = '#f00';
+
+            var selectElement = document.getElementById("choices");
+            var selectedValue = selectElement.value;
+            console.log("searchTag", tag);
+            var valueTag = tag.replace(/ /g, "_");
+            // Gửi yêu cầu AJAX để lấy dữ liệu comment
+            $.ajax({
+                url: `/homepage/searchTag/${valueTag}/`,
+                type: `POST`,
+                data: {'choices': selectedValue},
+                success: function(response) {
+                    var containerSearch = document.getElementById("containerSearch");
+                    containerSearch.innerHTML = '';
+                    var lengthData;
+                    if ( selectedValue === 'shop'){
+                        showShop(response.dataShop, containerSearch);
+                        lengthData = response.dataShop.length;
+                    }
+                    else{
+                        showProduct(response.dataProduct, containerSearch);
+                        lengthData = response.dataProduct.length;
+                    }
+                    if(lengthData === 0) alert("Không tìm kiếm được gì!!");
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+        function showShop(dataShop, containerSearch){
+            containerSearch.innerHTML = '';
+            dataShop.forEach(function(shop) {
+                console.log(shop.id)
+                var shopHTML = `
+                    <div class="post">
+                        <img class="img-food" src="${shop.avatar}" alt="">
+                        <div class="info" style="padding-left: 10px;">
+                            <div class="text">
+                                <h3>${shop.name}</h3>
+                                <p>Đánh giá: ${shop.avgStar}/5 <span><img class="search_imgstar" src="{% static 'images/star.png' %}" alt=""></span></p>
+                                <p>${shop.district}-${shop.ward}</p>
+                            </div>
+    
+                        </div>
+                        <hr>
+                        <div class="cost">
+                            <a href="/profile/${shop.id}/">
+                                <button>Tới cửa hàng</button>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                containerSearch.innerHTML += shopHTML;
+            })
+        }
+        function showProduct(dataProduct, containerSearch){
+            containerSearch.innerHTML = '';
+            dataProduct.forEach(function(product) {
+                var productHTML = `
+                <div class="post">
+                    <img class="img-food" src="${product.img}" alt="">
+                    <div class="info">
+                        <a href="/profile/${product.provider.id}/"">
+                            <img class="img-avt" src="${product.provider.avatar}" alt="">
+                        </a>
+                        <div class="text">
+                            <h3>${product.name}</h3>
+                            <!--<p>Like: {{item.like}}, dislike: {{item.dislike}}</p> -->
+                            <p>Provider: ${product.provider.name}</p>
+
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="cost">
+                        <button onclick="addToCart(${product.id})">${product.price} VND</button>
+                    </div>
+                </div>
+                `;
+                containerSearch.innerHTML += productHTML;
+            })
+        }
+
+        // Tìm kiếm chính ---------------------
+        function mainSearch(event){
+            var selectElement = document.getElementById("choices");
+            var selectedValue = selectElement.value;
+
+            var searchKeyElement = document.getElementById("searchKey");
+            var searchKey = searchKeyElement.value;
+
+            var t_openElement = document.getElementById("t_open");
+            var t_open = t_openElement.value;
+            var t_closedElement = document.getElementById("t_closed");
+            var t_closed = t_closedElement.value;
+
+            var cityElement = document.getElementById("city");
+            var city = cityElement.value;
+            var districtElement = document.getElementById("district");
+            var district = districtElement.value;
+            var wardElement = document.getElementById("ward");
+            var ward = wardElement.value;
+
+            $.ajax({
+                url: `/homepage/search/`,
+                type: `POST`,
+                data: {
+                    'choices': selectedValue,
+                    'searchKey': searchKey,
+                    'city': city, 'district': district, 'ward': ward,
+                    't_open': t_open,
+                    't_closed': t_closed,
+                },
+                success: function(response) {
+                    var containerSearch = document.getElementById("containerSearch");
+                    containerSearch.innerHTML = '';
+                    var lengthData ;
+                    if ( selectedValue === 'shop'){
+                        showShop(response.dataShop, containerSearch);
+                        lengthData = response.dataShop.length;
+                    }
+                    else{
+                        showProduct(response.dataProduct, containerSearch);
+                        lengthData = response.dataProduct.length;
+                    }
+                    if(lengthData === 0) alert("Không tìm kiếm được gì!!");
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
+    <script>
+        function addToCart(itemId){
+            $.ajax({
+                url: `/shoppingcart/addToCart/`,
+                type: `POST`,
+                data: {
+                    'itemId': itemId,
+                },
+                success: function(response) {
+                    alert("Đã thêm vào giỏ hàng");
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
+        <script src="{% static 'js/header_logged.js' %}"></script>
+{% endblock feature %}
+
+

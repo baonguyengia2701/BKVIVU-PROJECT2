@@ -13,7 +13,7 @@
 ### 1. Clone dự án từ GitHub:
 - Tải dự án về thiết bị của bạn:
     ```bash
-    git clone https://github.com/tandat17z/HUST_IntroToSoftwareEngineering_BKvivu.git
+    git clone https://github.com/baonguyengia2701/PROJECT2.git
     ```
 - Tới thư mục làm việc của dự án. Ví dụ:
     ```bash

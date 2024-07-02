@@ -119,7 +119,6 @@ class Manager(models.Model):
     num_votes = models.IntegerField(null=True, default=0) #tổng số lượt đánh giá
     avgStar = models.FloatField(default=0.0) #Số sao đánh giá trung bình của cửa hàng
 
-
     def __str__(self):
         return f"{self.account}"
 
